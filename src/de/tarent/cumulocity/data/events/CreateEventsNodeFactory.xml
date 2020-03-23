@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBSink.png" type="Sink"
+	xmlns="http://knime.org/node/v2.8"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+	<name>Cumulocity Events Creator</name>
+
+	<shortDescription>
+		Creates one event from each row of the given table
+	</shortDescription>
+
+	<fullDescription>
+		<intro>Connect to the Cumulocity events API and create one event from
+			each row of the given table
+		</intro>
+
+		<option name="Event Type">Type of event to report. Use cot_abc_xyz style.
+			(required)
+		</option>
+		<option name="Source Name"> Name of the source that created this event.
+			Typically the device name. (optional)
+		</option>
+		<option name="Source ID">ID of the source that created this event.
+			Typically this is the id of the originating device. (required)
+		</option>
+		<option name="Description">A description of the event. (optional)
+		</option>
+		<option name="Time">Time this event was raised. If not set, then the
+			current system time is used. (optional)
+		</option>
+
+
+
+	</fullDescription>
+
+	<ports>
+		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<inPort index="1" name="Events">Data describing the respective events to
+			be created.
+		</inPort>
+	</ports>
+
+</knimeNode>

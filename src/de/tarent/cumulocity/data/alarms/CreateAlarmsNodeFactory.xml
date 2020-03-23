@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBSink.png" type="Sink"
+	xmlns="http://knime.org/node/v2.8"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+	<name>Cumulocity Alarms Creator</name>
+
+	<shortDescription>
+		Creates one alarm from each row of the given table
+	</shortDescription>
+
+	<fullDescription>
+		<intro>Connect to the Cumulocity alarms API and create one alarm from
+			each row of the given table
+		</intro>
+
+		<option name="Alarm Type">Type of alarm to report. Please note that alarms
+			are aggregated by alarm type (for the same device). Each new alarm
+			for given device of the same type will increase the count. (required)
+		</option>
+		<option name="Severity">Alarm severity, could be any string, but
+			recommended values are:
+			'CRITICAL', 'MAJOR', 'MINOR', and 'WARNING'.
+			If
+			not set, then 'WARNING' is used. Note that any string value
+			containing "critical" will be mapped to "CRITICAL", respectively for
+			the other values! This means that the value could be "my critical
+			alarm" in KNIME, but will still be "CRITICAL" in Cumulocity.
+			(optional)
+		</option>
+		<option name="Source Name"> Name of the source that created this alarm.
+			Typically the device name. (optional)
+		</option>
+		<option name="Source ID">ID of the source that created this alarm.
+			Typically this is the id of the originating device. (required)
+		</option>
+		<option name="Description">A description of the alarm. (optional)
+		</option>
+		<option name="Status">Alarm status, could be any string, but recommended
+			values are: 'ACKNOWLEDGED', 'ACTIVE', and
+			'CLEARED'. If not set, then
+			'ACTIVE' is used. Note that any string value
+			containing "active" will
+			be mapped to "ACTIVE", respectively for
+			the other values!
+			(optional)
+		</option>
+		<option name="Time">Time this alarm was raised. If not set, then the
+			current system time is used. (optional)
+		</option>
+
+
+
+	</fullDescription>
+
+	<ports>
+		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<inPort index="1" name="Alarms">Data describing the respective alarms to
+			be created.
+		</inPort>
+	</ports>
+
+</knimeNode>

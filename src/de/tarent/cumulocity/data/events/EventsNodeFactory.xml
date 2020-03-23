@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBQuery.png" type="Source" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Cumulocity Events Retriever</name>
+	<shortDescription>
+		Connect to the Cumulocity events API and
+		retrieve
+		events
+	</shortDescription>
+
+	<fullDescription>
+		<intro>Retrieves Cumulocity events.</intro>
+
+		<option name="Max number of records to retrieve">Maximal number of records to retrieve. Use -1 for all records.
+		</option>
+
+		<option name="From Date">Retrieve only events younger than this date. Note
+			that the restriction is on the 'Time' attribute of the measurement
+			and not on the 'Creation Time' attribute. (optional)
+		</option>
+		<option name="To Date ">Retrieve only events older than this date. Note
+			that the restriction is on the 'Time' attribute of the measurement
+			and not on the 'Creation Time' attribute. (optional)
+		</option>
+	</fullDescription>
+
+	<ports>
+		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<outPort index="0" name="Retrieved Events">Retrieved events filtered by
+			criteria.
+			Output columns are 'Event ID, 'Event Type',
+			'Creation Time', 'Source Name', 'Source ID', 'Description',  and
+			'Time'.
+		</outPort>
+	</ports>
+</knimeNode>

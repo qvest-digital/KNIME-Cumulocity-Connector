@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBQuery.png" type="Source"
+	xmlns="http://knime.org/node/v2.8"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+	<name>Cumulocity Measurements Retriever</name>
+
+	<shortDescription>
+		Connect to the Cumulocity measurements API and
+		retrieve measurements of the
+		devices
+	</shortDescription>
+
+	<fullDescription>
+		<intro>Retrieves the measurements for the given device IDs. </intro>
+
+		<option name="Device IDs">String column that should contain the IDs of the
+			devices for which measurements are to be retrieved. Use a row filter
+			before this node to select a subset of devices as necessary.
+		</option>
+
+		<option name="Max number of records to retrieve">Maximal number of measurements to retrieve. Use -1
+			for all records. Note that the number of measurements retrieved may
+			be slightly larger than this number since always all fragments of a
+			measurement are retrieved.
+		</option>
+
+		<option name="From Date (optional)">Retrieve only measurements younger than this date.
+		</option>
+		<option name="To Date (optional)">Retrieve only measurements older than this date.
+		</option>
+	</fullDescription>
+
+	<ports>
+		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<inPort index="1" name="Device list">Data containing the list of devices to
+			be retrieved
+		</inPort>
+		<outPort index="0" name="Retrieved Measurements">Retrieved Measurements filtered by
+			criteria. Output columns are 'Measurement ID, 'Measurement Type',
+			'Device ID', 'Zoned Date Time', 'Fragment Series', 'Value', and
+			'Unit'.
+		</outPort>
+	</ports>
+</knimeNode>

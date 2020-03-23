@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBQuery.png" type="Source"
+	xmlns="http://knime.org/node/v2.8"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+	<name>Cumulocity Alarms Retriever</name>
+	<shortDescription>
+		Connect to the Cumulocity alarms API and
+		retrieve
+		alarms
+	</shortDescription>
+
+	<fullDescription>
+		<intro>Retrieves Cumulocity alarms.</intro>
+
+		<option name="Max number of records to retrieve">Maximal number of alarms to retrieve. Use -1 for all records.
+		</option>
+
+		<option name="From Date">Retrieve only alarms younger than this date. Note
+			that the restriction is on the 'Time' attribute of the measurement
+			and not on the 'Creation Time' attribute. (optional)
+		</option>
+		<option name="To Date ">Retrieve only alarms older than this date. Note
+			that the restriction is on the 'Time' attribute of the measurement
+			and not on the 'Creation Time' attribute. (optional)
+		</option>
+	</fullDescription>
+
+	<ports>
+		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<outPort index="0" name="Retrieved Alarms">Retrieved alarms filtered by
+			criteria.
+			Output columns are 'Alarm ID, 'Alarm Type',
+			'Severity', 'Creation
+			Time', 'Count', 'Source Name', 'Source ID', 'Description', 'Status',
+			'Time', and
+			'First Occurrence Time'.
+		</outPort>
+	</ports>
+</knimeNode>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBSink.png" type="Sink"
+	xmlns="http://knime.org/node/v2.8"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+	<name>Cumulocity Measurements Creator</name>
+
+	<shortDescription>
+		Creates one measurement from each row of the given
+		table. Please note that this node should be used primarily for testing
+		purposes. Real measurements should be created by devices!
+	</shortDescription>
+
+	<fullDescription>
+		<intro>Connect to the Cumulocity measurements API and create one
+			measurement from
+			each row of the given table
+		</intro>
+
+		<option name="Measurement Type">Type of measurement to store.
+			(required)
+		</option>
+		<option name="Source Name"> Name of the source that created this measurement.
+			Typically the device name. (optional)
+		</option>
+		<option name="Source ID">ID of the source that created this measurement.
+			Typically this is the id of the originating device. (required)
+		</option>
+		<option name="Time">Time this measurements was created. If not set,
+			then the
+			current system time is used. (optional)
+		</option>
+		<option name="Measurement Subtype">Some description of the actual measurement type. (optional)
+		</option>
+		<option name="Fragment Series">Each measurement may contain a number of fragments. (optional)
+		</option>
+		<option name="Value">The actual measurement value, must be a Double value. (required)
+		</option>
+		<option name="Unit">The measurement unit. Examples are: '°C', '%', 'µS/cm', and 'lux'. (required)
+		</option>
+
+	</fullDescription>
+
+	<ports>
+		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<inPort index="1" name="Events">Data describing the respective
+			measurements to
+			be created.
+		</inPort>
+	</ports>
+
+</knimeNode>

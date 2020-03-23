@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cumulocity-Node extensions for the KNIME Workbench
+Bundle-SymbolicName: de.tarent.cumulocity.connector; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: cumulocityconnectordeviceretriever.jar,
+ lib/gson-2.8.5.jar,
+ lib/java-rest-client-1.1.0.jar,
+ lib/okhttp-3.9.0.jar,
+ lib/okio-1.13.0.jar
+Bundle-Activator: de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodePlugin
+Bundle-Vendor: tarent solutions GmbH
+Require-Bundle: org.knime.workbench.core,
+ org.knime.base,
+ org.knime.time;bundle-version="4.1.0"
+Bundle-ActivationPolicy: lazy
+Export-Package: de.tarent.cumulocity.connector
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+

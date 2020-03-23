@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBConnector.png" type="Source" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Cumulocity Connector</name>
+    
+    <shortDescription>
+        Connects to the Cumulocity IOT API with the provided url, username and password.        
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>Provides a connection to the Cumulocity API.
+        
+        See <a href="https://www.softwareag.com/corporate/products/internet_of_things/default.html">https://www.softwareag.com/corporate/products/internet_of_things/default.html</a> for more details.
+        </intro>
+        
+        <option name="Host">Address of the host. Use a URL such as https://your-company.cumulocity.com or IP address. </option>
+        <option name="Tenant">Tenant of the user (optional)</option>
+        <option name="Credentials">Use pred-defined credentials to authenticate. </option>
+        <option name="Username">Username of the user</option>
+        <option name="Password">Password of the user </option>
+    </fullDescription>
+    
+    <ports>
+        <outPort index="0" name="Cumulocity Connection">Cumulocity Connection Info.</outPort>
+    </ports>    
+</knimeNode>

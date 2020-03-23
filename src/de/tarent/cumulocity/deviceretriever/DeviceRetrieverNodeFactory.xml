@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./CumulocityDBQuery.png" type="Source" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name><![CDATA[Cumulocity Device Retriever]]></name>
+    
+    <shortDescription>
+        Retrieves ids, names and types of the accessible devices from the given Cumulocity connection.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>Retrieves the ID, type and names of the accessible devices by connecting to the Cumulocity API.
+        
+        See <a href="https://www.softwareag.com/corporate/products/internet_of_things/default.html">https://www.softwareag.com/corporate/products/internet_of_things/default.html</a> for more details.
+        
+        This node has currently no options.
+        </intro>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Cumulocity Connection">Cumulocity Connection Info.</inPort>
+        <outPort index="0" name="Requested Devices">Data table containing the list of devices, with columns 'Device ID', 'Type', and 'Device Name', of type 'String'.</outPort>
+    </ports>    
+</knimeNode>
