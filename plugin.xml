@@ -9,7 +9,7 @@
     <extension point="org.knime.workbench.repository.categories">
                                              
         
-        <category description="Cumulocity IoT DB access" icon="/CumulocityTarent_white.png" level-id="cumulocity" name="Cumulocity" path="/"/>
+        <category description="Cumulocity IoT DB access" icon="icons/CumulocityTarent_white.png" level-id="cumulocity" name="Cumulocity" path="/"/>
             
     
     </extension>
