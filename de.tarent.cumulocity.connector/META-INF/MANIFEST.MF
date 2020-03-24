@@ -10,9 +10,10 @@ Bundle-ClassPath: cumulocityconnectordeviceretriever.jar,
  lib/okio-1.13.0.jar
 Bundle-Activator: de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodePlugin
 Bundle-Vendor: tarent solutions GmbH
-Require-Bundle: org.knime.workbench.core,
- org.knime.base,
- org.knime.time;bundle-version="4.1.0"
+Require-Bundle: org.knime.workbench.core;bundle-version="[4.1.0,5.0.0)",
+ org.knime.base;bundle-version="[4.1.0,5.0.0)",
+ org.knime.time;bundle-version="[4.1.0,5.0.0)",
+ org.knime.workbench.repository;bundle-version="[4.1.0,5.0.0)"
 Bundle-ActivationPolicy: lazy
 Export-Package: de.tarent.cumulocity.connector
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
