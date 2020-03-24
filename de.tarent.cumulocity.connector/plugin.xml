@@ -1,89 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?eclipse version="3.0"?><plugin>
-                    
-    
-      
-    
-    
-    
+<?eclipse version="3.0"?>
+<plugin>
     <extension point="org.knime.workbench.repository.categories">
-                                             
-        
         <category description="Cumulocity IoT DB access" icon="icons/CumulocityTarent_white.png" level-id="cumulocity" name="Cumulocity" path="/"/>
-            
-    
     </extension>
-                   
-    
-    
-    
-    
     <extension point="org.knime.workbench.repository.nodes">
-                                        
-        
-        
-        
-        
-        <node category-path="/cumulocity" factory-class="de.tarent.cumulocity.connector.CumulocityConnectorNodeFactory" id="de.tarent.cumulocity.connector.CumulocityConnectorNodeFactory"/>
-                                        
-        
-        
-        
-        
-        <node after="de.tarent.cumulocity.connector.CumulocityConnectorNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodeFactory" id="de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodeFactory"/>
-                                            
-        
-        
-        
-        
-        <node after="de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.measurements.MeasurementsNodeFactory" id="de.tarent.cumulocity.data.measurements.MeasurementsNodeFactory"/>
-            
-        <node
-              after="de.tarent.cumulocity.data.measurements.MeasurementsNodeFactory"
-              category-path="/cumulocity"
-              factory-class="de.tarent.cumulocity.data.measurements.MeasurementCreatorNodeFactory"
-              id="de.tarent.cumulocity.data.measurements.MeasurementCreatorNodeFactory"/>
-                                                                
-        
-        
-        
-        
-        <node after="de.tarent.cumulocity.data.events.CreateEventsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.alarms.AlarmsNodeFactory" id="de.tarent.cumulocity.data.alarms.AlarmsNodeFactory"/>
-                            
-        
-        
-        <node after="de.tarent.cumulocity.data.measurements.MeasurementCreatorNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.events.EventsNodeFactory" id="de.tarent.cumulocity.data.events.EventsNodeFactory"/>
-                    
-        
-        <node after="de.tarent.cumulocity.data.events.EventsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.events.CreateEventsNodeFactory" id="de.tarent.cumulocity.data.events.CreateEventsNodeFactory"/>
-                                    
-        
-        
-        
-        <node after="de.tarent.cumulocity.data.alarms.AlarmsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.alarms.CreateAlarmsNodeFactory" id="de.tarent.cumulocity.data.alarms.CreateAlarmsNodeFactory"/>
+        <node category-path="/cumulocity" factory-class="de.tarent.cumulocity.connector.CumulocityConnectorNodeFactory" />
+        <node after="de.tarent.cumulocity.connector.CumulocityConnectorNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodeFactory" />
+        <node after="de.tarent.cumulocity.deviceretriever.DeviceRetrieverNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.measurements.MeasurementsNodeFactory" />
+        <node after="de.tarent.cumulocity.data.measurements.MeasurementsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.measurements.MeasurementCreatorNodeFactory" />
+        <node after="de.tarent.cumulocity.data.events.CreateEventsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.alarms.AlarmsNodeFactory" />
+        <node after="de.tarent.cumulocity.data.measurements.MeasurementCreatorNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.events.EventsNodeFactory" />
+        <node after="de.tarent.cumulocity.data.events.EventsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.events.CreateEventsNodeFactory" />
+        <node after="de.tarent.cumulocity.data.alarms.AlarmsNodeFactory" category-path="/cumulocity" factory-class="de.tarent.cumulocity.data.alarms.CreateAlarmsNodeFactory" />
     </extension>
-                    
-    
-    
-    
-    
-    
     <extension point="org.knime.core.PortType">
-                                        
-        
-        
-        
-        
         <portType hidden="false" name="de.tarent.cumulocity.connector.CumulocityPortObject.TYPE" objectClass="de.tarent.cumulocity.connector.CumulocityPortObject" objectSerializer="de.tarent.cumulocity.connector.CumulocityPortObject$Serializer" specClass="de.tarent.cumulocity.connector.CumulocityPortObjectSpec" specSerializer="de.tarent.cumulocity.connector.CumulocityPortObjectSpec$Serializer">
-      </portType>
-                                    
-    
-    
-    
-    
+        </portType>
     </extension>
-                
-
-
-
 </plugin>
