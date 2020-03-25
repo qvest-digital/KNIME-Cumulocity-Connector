@@ -1,17 +1,17 @@
 # Cumulocity / KNIME
 ## A bidrectional Connector from KNIME to the Cumulocity IoT Platform
 
-The “Cumulocity Nodes” collection of nodes provides functionality to retrieve information about IoT devices, corresponding measurements, alarms and events from a given [Cumulocity IoT](https://www.softwareag.cloud/site/product/cumulocity-iot.html) platform instance. This data, possibly in combination with any other data, can be used to create new events and alarms within [KNIME](https://knime.org) and write them back to Cumulocity in order to trigger the corresponding actions within Cumulocity.
+The “Cumulocity Nodes” collection provides functionality to retrieve information about IoT devices, corresponding measurements, alarms and events from a given [Cumulocity IoT](https://www.softwareag.cloud/site/product/cumulocity-iot.html) platform instance. This data, possibly in combination with any other data, can be used to create new events and alarms within [KNIME](https://knime.org) and write them back to Cumulocity in order to trigger the corresponding actions within Cumulocity.
 
 ![Example Cumulocity Machine Learning Workflow](documentation/CumulocityMachineLearningWorkflow.png)
 
 ## Technical Details
-The “Cumulocity Nodes” collection of nodes utilizes the [REST interface of Cumulocity](https://cumulocity.com/guides/reference/rest-implementation/). This implies the typically restrictions that come with REST interfaces hold here as well: it is not recommended to retrieve information about millions of devices or measurements at the same time and some requests may take a little bit longer than others...
-We have already implemented a number of filters for some of the nodes that enable users to restrict the amount of data that is retrieved. Please feel free to use the feature request option (TODO link) if you need addtional filters.
+The “Cumulocity Nodes” collection for KNIME utilizes the [REST interface of Cumulocity](https://cumulocity.com/guides/reference/rest-implementation/). By the nature of REST interfaces, we recommend to limit the amount of data retrieved by preselecting the required device data to ensure error-free and fast retrieval.
+We have already implemented a number of filters (see below) for some of the nodes that enable users to restrict the amount of data that is retrieved. Please feel free to use the [feature request option](https://github.com/tarent/KNIME-Cumulocity-Connector/issues/) if you need addtional filters.
 
 
 ## Features:
-The following KNIME-nodes are currently available:
+The following nodes are currently available in KNIME:
 
 *  **Cumulocity Connector**: stores connection information in KNIME and creates the corresponding 'connection port' that can be used by subsequent nodes to call the REST interface of Cumulocity in order to GET and POST information.
 *  **Cumulocity Device Retriever**: retrieves basic information (id, type, and name) about devices from Cumulocity.
@@ -29,7 +29,7 @@ No specifc visualization has been implemented.
 
 ## Installation
 
-You can install these nodes in KNIME 4.2 (?TODO) or above following these steps:
+You can install these nodes in KNIME 4.2 or above following these steps:
 
     in KNIME, open Help/Install new software
     Click top right button “Add”, and add the repository:
@@ -45,8 +45,8 @@ You can install these nodes in KNIME 4.2 (?TODO) or above following these steps:
 
 ## Copyright and License
 
-Copyright (c) 2020 [tarent solutions GmbH](https://tarent.de). This program and the accompanying materials are made available under the terms of the GNU GENERAL PUBLIC LICENSE which accompanies this distribution, and is available at https://www.gnu.org/licenses/gpl-3.0.html
+Copyright (c) 2020 [tarent solutions GmbH](https://tarent.de). This program and the accompanying materials are made available under the terms of the GNU GENERAL PUBLIC LICENSE which accompanies this distribution, and is available at https://www.gnu.org/licenses/gpl-3.0.html.
 
 ## Source code
 
-The source code is shared in [GitHub](https://github.com/tarent/KNIME-Cumulocity-Connector). Contributions are warmly welcomed. Please report bugs, or feature requests, in the [GitHub bugtracker](https://github.com/tarent/KNIME-Cumulocity-Connector/issues/)
+The source code is shared in [GitHub](https://github.com/tarent/KNIME-Cumulocity-Connector). Contributions are warmly welcomed. Please report bugs, or feature requests, in the [GitHub bugtracker](https://github.com/tarent/KNIME-Cumulocity-Connector/issues/).
