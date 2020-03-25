@@ -3,18 +3,24 @@
       id="de.tarent.cumulocity.update"
       label="Cumulocity Connector Update"
       version="1.0.0.qualifier"
-      provider-name="Tarent">
+      provider-name="tarent solutions GmbH">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="https://github.com/tarent/KNIME-Cumulocity-Connector">
+      The “Cumulocity Nodes” collection provides functionality to retrieve
+information about IoT devices, corresponding measurements, alarms
+and events from a given Cumulocity IoT platform instance. This
+data, possibly in combination with any other data, can be used
+to create new events and alarms within KNIME and write them back
+to Cumulocity in order to trigger the corresponding actions within
+Cumulocity.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright url="https://tarent.de">
+      Copyright (c) 2020 tarent solutions GmbH
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="https://www.gnu.org/licenses/gpl-3.0.html">
+      This program and the accompanying materials are made available under the terms of the GNU GENERAL PUBLIC LICENSE which accompanies this distribution, and is available at https://www.gnu.org/licenses/gpl-3.0.html
    </license>
 
    <includes
