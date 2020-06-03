@@ -25,7 +25,7 @@ The following nodes are currently available in KNIME:
 ![Cumulocity Example Workflow](documentation/CumulocityKNIMENodes.png)
 
 ## Visualization
-No specifc visualization has been implemented.
+No specific visualization has been implemented.
 
 ## Installation
 
@@ -34,7 +34,7 @@ You can install these nodes in KNIME 4.2 or above following these steps:
     in KNIME, open Help/Install new software
     Click top right button “Add”, and add the repository:
         name: experimental update site
-        Location: http://update.knime.com/community-contributions/4.1
+        Location: http://update.knime.com/community-contributions/4.2
     After clicking ok, select this new entry in the combo box,
     Select the collection of nodes named “Cumulocity Nodes” (for example, by typing 'Cumulocity' in the search box).
     Follow the next steps to install the Cumulocity extension nodes.
