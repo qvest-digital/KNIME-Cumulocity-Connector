@@ -172,6 +172,9 @@ public class CreateEventsNodeModel extends NodeModel {
 				try {
 					eventApi.createEvent(event);
 					ctr++;
+					if (ctr % 100 == 0) {
+						logger.info("Wrote " + ctr + " events to Cumulocity.");						
+					}
 				} catch (CotSdkException cse) {
 					logger.error("Failed to write event " + event + " to Cumulocity!");
 					logger.error("Root cause: " + cse.getMessage());

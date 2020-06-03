@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Cumulocity-Node extensions for the KNIME Workbench
 Bundle-SymbolicName: de.tarent.cumulocity.connector; singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Bundle-ClassPath: cumulocityconnectordeviceretriever.jar,
  lib/gson-2.8.5.jar,
  lib/java-rest-client-1.1.0.jar,

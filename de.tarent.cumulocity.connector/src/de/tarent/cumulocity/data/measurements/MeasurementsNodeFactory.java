@@ -53,7 +53,7 @@ public class MeasurementsNodeFactory extends NodeFactory<MeasurementsNodeModel> 
 	 */
 	@Override
 	public NodeDialogPane createNodeDialogPane() {
-		return new RetrieveDataNodeDialog(true, 10000);
+		return new RetrieveDataNodeDialog(true, 10000, true);
 	}
 
 }

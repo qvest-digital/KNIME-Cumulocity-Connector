@@ -1,5 +1,5 @@
 # Cumulocity / KNIME
-## A bidrectional Connector from KNIME to the Cumulocity IoT Platform
+## A bidirectional Connector from KNIME to the Cumulocity IoT Platform
 
 The “Cumulocity Nodes” collection provides functionality to retrieve information about IoT devices, corresponding measurements, alarms and events from a given [Cumulocity IoT](https://www.softwareag.cloud/site/product/cumulocity-iot.html) platform instance. This data, possibly in combination with any other data, can be used to create new events and alarms within [KNIME](https://knime.org) and write them back to Cumulocity in order to trigger the corresponding actions within Cumulocity.
 

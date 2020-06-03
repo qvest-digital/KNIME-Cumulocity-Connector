@@ -14,6 +14,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeCellFactory;
@@ -21,8 +22,10 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 
 import com.telekom.m2m.cot.restsdk.event.Event;
@@ -32,6 +35,7 @@ import com.telekom.m2m.cot.restsdk.util.ExtensibleObject;
 import com.telekom.m2m.cot.restsdk.util.Filter.FilterBuilder;
 
 import de.tarent.cumulocity.connector.CumulocityPortObject;
+import de.tarent.cumulocity.data.IdIterator;
 import de.tarent.cumulocity.data.RetrieveDataNodeModel;
 
 /**
@@ -45,12 +49,42 @@ public class EventsNodeModel extends RetrieveDataNodeModel {
 
 	private static final String ATTRIBUTE_NAME = "name";
 	private static final NodeLogger logger = NodeLogger.getLogger(EventsNodeModel.class);
+	private static final int IN_PORT_CONNECTION_SETTINGS = 0;
 
 	/*
-	 * we have 1 input port (connection info) and one output port with the events
+	 * we have 1 required and one optional input port (connection info + device
+	 * selection) and one output port with the events
 	 */
 	protected EventsNodeModel() {
-		super(new PortType[] { CumulocityPortObject.TYPE });
+		super(new PortType[] { CumulocityPortObject.TYPE, BufferedDataTable.TYPE_OPTIONAL });
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+		if (inSpecs == null || inSpecs.length == 0) {
+			throw new InvalidSettingsException(
+					"Cumulocity Connection Info required on port " + IN_PORT_CONNECTION_SETTINGS);
+		}
+		if (inSpecs.length == 2) {
+			boolean hasStringColumn = false;
+			final DataTableSpec dataTable = ((DataTableSpec) inSpecs[RetrieveDataNodeModel.IN_PORT_DATA_TABLE]);
+			if (dataTable != null) {
+				for (int i = 0; (i < dataTable.getNumColumns()) && !hasStringColumn; i++) {
+					final DataColumnSpec columnSpec = dataTable.getColumnSpec(i);
+					if (columnSpec.getType().isCompatible(StringValue.class)) {
+						// found one string column
+						hasStringColumn = true;
+					}
+				}
+				if (!hasStringColumn) {
+					throw new InvalidSettingsException("Input table must contain at least one String column");
+				}
+			}
+		}
+		return super.configure(inSpecs);
 	}
 
 	/**
@@ -61,26 +95,34 @@ public class EventsNodeModel extends RetrieveDataNodeModel {
 	@Override
 	protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec)
 			throws CanceledExecutionException {
+		final long maxNum = getMaxNumItemsToFetch();
 		final EventApi eventApi = getEventApi((CumulocityPortObject) inData[0]);
 
-		final Optional<FilterBuilder> optionalFilter = getOptionalDateFilter();
-		final Iterator<Event> eventsIterator;
-		if (optionalFilter.isPresent()) {
-			eventsIterator = eventApi.getEvents(optionalFilter.get()).stream().iterator();
-		} else {
-			eventsIterator = eventApi.getEvents().stream().iterator();			
-		}
+		final IdIterator device_ids = retrieveDeviceIDs((BufferedDataTable) inData[IN_PORT_DATA_TABLE]);
 
-		long rowIx = 0;
-		final long maxNum;
-		if (m_maxNumRecordsSettings.getLongValue() > 0) {
-			maxNum = m_maxNumRecordsSettings.getLongValue();
-		} else {
-			maxNum = Long.MAX_VALUE;
-		}
-		final DataCell[] cells = new DataCell[7];
 		final DataTableSpec outputSpec = outputTableSpec();
 		final BufferedDataContainer container = exec.createDataContainer(outputSpec);
+
+		long rowIx = 0;
+		while (rowIx < maxNum && device_ids.hasNext()) {
+			final Optional<FilterBuilder> optionalFilter = addOptionalDateFilter(device_ids.next());
+			final Iterator<Event> eventsIterator;
+			if (optionalFilter.isPresent()) {
+				eventsIterator = eventApi.getEvents(optionalFilter.get()).stream().iterator();
+			} else {
+				eventsIterator = eventApi.getEvents().stream().iterator();
+			}
+
+			rowIx = retrieveEventsForFilter(exec, rowIx, maxNum, eventsIterator, container);
+		}
+		return new BufferedDataTable[] { container.getTable() };
+	}
+
+	protected long retrieveEventsForFilter(final ExecutionContext exec, long rowIx, final long maxNum,
+			final Iterator<Event> eventsIterator, final BufferedDataContainer container)
+			throws CanceledExecutionException {
+
+		final DataCell[] cells = new DataCell[7];
 		try {
 			while (eventsIterator.hasNext()) {
 
@@ -124,14 +166,14 @@ public class EventsNodeModel extends RetrieveDataNodeModel {
 				logger.error("Failed to retrieve any events!");
 				throw cse;
 			} else {
-				logger.error("Failed to retrieved only "+rowIx+" events, but there might be more!");
+				logger.error("Retrieved only " + rowIx + " events, but there might be more!");
 			}
 			logger.error("Root cause: " + cse.getMessage());
 		} finally {
 			container.close();
 			logger.info("Retrieved " + rowIx + " events.");
 		}
-		return new BufferedDataTable[] { container.getTable() };
+		return rowIx;
 	}
 
 	protected DataTableSpec outputTableSpec() {

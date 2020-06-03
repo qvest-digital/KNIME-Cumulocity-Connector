@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/java-rest-client-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/okhttp-3.9.0.jar"/>
 	<classpathentry kind="lib" path="lib/okio-1.13.0.jar"/>
+	<classpathentry kind="lib" path="/home/dwetts/tools/knime/eclipse/plugins/org.knime.rest_4.1.3.v202005112253.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

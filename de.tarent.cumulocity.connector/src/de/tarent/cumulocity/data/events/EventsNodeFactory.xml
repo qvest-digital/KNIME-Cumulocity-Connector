@@ -10,6 +10,12 @@
 	<fullDescription>
 		<intro>Retrieves Cumulocity events.</intro>
 
+		<option name="Device IDs">Optional String column that can contain the IDs of the
+			devices for which events are to be retrieved. Use a row filter
+			before this node to select a subset of devices as necessary. If not set, then all 
+			events will be retrieved (subject to the max number set below)
+		</option>
+
 		<option name="Max number of records to retrieve">Maximal number of records to retrieve. Use -1 for all records.
 		</option>
 
@@ -25,6 +31,8 @@
 
 	<ports>
 		<inPort index="0" name="Cumulocity Connection Info">Cumulocity Connection Info.</inPort>
+		<inPort index="1" name="Device list">Optional table with list of device ids - if provided then only events from these devices will be retrieved.
+		</inPort>
 		<outPort index="0" name="Retrieved Events">Retrieved events filtered by
 			criteria.
 			Output columns are 'Event ID, 'Event Type',
