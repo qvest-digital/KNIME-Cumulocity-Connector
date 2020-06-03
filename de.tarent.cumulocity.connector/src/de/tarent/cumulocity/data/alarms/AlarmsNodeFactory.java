@@ -28,7 +28,6 @@ public class AlarmsNodeFactory
 	 */
 	@Override
 	public int getNrNodeViews() {
-		// The number of views the node should have, in this cases there is none.
 		return 0;
 	}
 
@@ -46,7 +45,6 @@ public class AlarmsNodeFactory
 	 */
 	@Override
 	public boolean hasDialog() {
-		// Indication whether the node has a dialog or not.
 		return true;
 	}
 
@@ -55,7 +53,7 @@ public class AlarmsNodeFactory
 	 */
 	@Override
 	public NodeDialogPane createNodeDialogPane() {
-		return new RetrieveDataNodeDialog(false, 1000);
+		return new RetrieveDataNodeDialog(true, 1000, false);
 	}
 
 }

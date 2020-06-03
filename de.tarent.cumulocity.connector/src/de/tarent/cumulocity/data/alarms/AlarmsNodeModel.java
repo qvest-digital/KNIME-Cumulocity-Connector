@@ -14,6 +14,7 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
@@ -22,8 +23,10 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 
 import com.google.gson.internal.LazilyParsedNumber;
@@ -34,28 +37,61 @@ import com.telekom.m2m.cot.restsdk.util.ExtensibleObject;
 import com.telekom.m2m.cot.restsdk.util.Filter.FilterBuilder;
 
 import de.tarent.cumulocity.connector.CumulocityPortObject;
+import de.tarent.cumulocity.data.IdIterator;
 import de.tarent.cumulocity.data.RetrieveDataNodeModel;
 
 /**
  * implementation of the node model of the "Alarms" node.
  * 
  * retrieves alarms from Cumulocity
+ * 
+ * please note that the code in this class is almost identical to the implementation of EventsNodelModel
  *
  * @author tarent solutions GmbH
  */
 public class AlarmsNodeModel extends RetrieveDataNodeModel {
 
 	private static final NodeLogger logger = NodeLogger.getLogger(AlarmsNodeModel.class);
+	private static final int IN_PORT_CONNECTION_SETTINGS = 0;
 
 	private static final int RESULT_SIZE = 100;
 
 	/*
-	 * we have 1 input port (connection info) and one output port with the alarms
+	 * we have 1 required and one optional input port (connection info + device
+	 * selection) and one output port with the alarms
 	 */
 	protected AlarmsNodeModel() {
-		super(new PortType[] { CumulocityPortObject.TYPE });
+		super(new PortType[] { CumulocityPortObject.TYPE, BufferedDataTable.TYPE_OPTIONAL });
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+		if (inSpecs == null || inSpecs.length == 0) {
+			throw new InvalidSettingsException(
+					"Cumulocity Connection Info required on port " + IN_PORT_CONNECTION_SETTINGS);
+		}
+		if (inSpecs.length == 2) {
+			boolean hasStringColumn = false;
+			final DataTableSpec dataTable = ((DataTableSpec) inSpecs[RetrieveDataNodeModel.IN_PORT_DATA_TABLE]);
+			if (dataTable != null) {
+				for (int i = 0; (i < dataTable.getNumColumns()) && !hasStringColumn; i++) {
+					final DataColumnSpec columnSpec = dataTable.getColumnSpec(i);
+					if (columnSpec.getType().isCompatible(StringValue.class)) {
+						// found one string column
+						hasStringColumn = true;
+					}
+				}
+				if (!hasStringColumn) {
+					throw new InvalidSettingsException("Input table must contain at least one String column");
+				}
+			}
+		}
+		return super.configure(inSpecs);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 *
@@ -66,25 +102,35 @@ public class AlarmsNodeModel extends RetrieveDataNodeModel {
 			throws CanceledExecutionException {
 
 		final AlarmApi alarmApi = getAlarmApi((CumulocityPortObject) inData[0]);
-		final Optional<FilterBuilder> optionalFilter = getOptionalDateFilter();
-		final Iterator<Alarm> alarmsIterator;
-		if (optionalFilter.isPresent()) {
-			alarmsIterator = alarmApi.getAlarms(optionalFilter.get(), RESULT_SIZE).stream().iterator();
-		} else {
-			alarmsIterator = alarmApi.getAlarms(RESULT_SIZE).stream().iterator();
-		}
+		
+		final long maxNum = getMaxNumItemsToFetch();
+
+		final IdIterator device_ids = retrieveDeviceIDs((BufferedDataTable) inData[IN_PORT_DATA_TABLE]);
 
 		long rowIx = 0;
-		final long maxNum;
-		if (m_maxNumRecordsSettings.getLongValue() > 0) {
-			maxNum = m_maxNumRecordsSettings.getLongValue();
-		} else {
-			maxNum = Long.MAX_VALUE;
-		}
-
-		final DataCell[] cells = new DataCell[11];
 		final DataTableSpec outputSpec = outputTableSpec();
 		final BufferedDataContainer container = exec.createDataContainer(outputSpec);
+
+		while (rowIx < maxNum && device_ids.hasNext()) {
+			final Optional<FilterBuilder> optionalFilter = addOptionalDateFilter(device_ids.next());
+			final Iterator<Alarm> alarmsIterator;
+			if (optionalFilter.isPresent()) {
+				alarmsIterator = alarmApi.getAlarms(optionalFilter.get(), RESULT_SIZE).stream().iterator();
+			} else {
+				alarmsIterator = alarmApi.getAlarms(RESULT_SIZE).stream().iterator();
+			}
+
+			rowIx = retrieveAlarmsForFilter(container, exec, maxNum, alarmsIterator, rowIx);
+		}
+
+		final BufferedDataTable out = container.getTable();
+		return new BufferedDataTable[] { out };
+	}
+
+	protected long retrieveAlarmsForFilter(final BufferedDataContainer container, 
+			final ExecutionContext exec, final long maxNum,
+			final Iterator<Alarm> alarmsIterator, long rowIx) throws CanceledExecutionException {
+		final DataCell[] cells = new DataCell[11];
 		try {
 			// Create output table specification
 			while (alarmsIterator.hasNext()) {
@@ -140,8 +186,7 @@ public class AlarmsNodeModel extends RetrieveDataNodeModel {
 			container.close();
 			// not supported alarmsIterator.close();
 		}
-		final BufferedDataTable out = container.getTable();
-		return new BufferedDataTable[] { out };
+		return rowIx;
 	}
 
 	protected DataTableSpec outputTableSpec() {

@@ -26,7 +26,7 @@
 		<option name="Description">A description of the event. (optional)
 		</option>
 		<option name="Time">Time this event was raised. If not set, then the
-			current system time is used. (optional)
+			current system time is used. (optional, expected type: 'ZonedDateTime')
 		</option>
 
 

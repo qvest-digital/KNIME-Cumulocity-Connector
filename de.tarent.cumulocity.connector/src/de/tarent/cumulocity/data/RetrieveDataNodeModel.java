@@ -25,25 +25,23 @@ import org.knime.core.util.Pair;
 import com.telekom.m2m.cot.restsdk.alarm.AlarmApi;
 import com.telekom.m2m.cot.restsdk.event.EventApi;
 import com.telekom.m2m.cot.restsdk.measurement.MeasurementApi;
-import com.telekom.m2m.cot.restsdk.measurement.MeasurementCollection;
 import com.telekom.m2m.cot.restsdk.util.Filter;
 import com.telekom.m2m.cot.restsdk.util.Filter.FilterBuilder;
-import com.telekom.m2m.cot.restsdk.util.FilterBy;
 
 import de.tarent.cumulocity.connector.CotPlatformProvider;
 import de.tarent.cumulocity.connector.CumulocityPortObject;
 
 /**
- * @author tarent (vlahar)
+ * @author tarent solutions GmbH
  */
 public abstract class RetrieveDataNodeModel extends NodeModel {
 
-	static final int IN_PORT_DATA_TABLE = 1;
+	protected static final int IN_PORT_DATA_TABLE = 1;
 
 	private static final String KEY_DEVICE_ID_COLUMN = "key_device_id_col";
 
 	// private static final NodeLogger logger =
-	// NodeLogger.getLogger(GetMeasurementsNodeModel.class);
+	// NodeLogger.getLogger(RetrieveDataNodeModel.class);
 	/**
 	 * the settings key which is used to retrieve and store the settings (from the
 	 * dialog or from a settings file) (package visibility to be usable from the
@@ -56,6 +54,9 @@ public abstract class RetrieveDataNodeModel extends NodeModel {
 	private final SettingsModelDate m_fromDateSettings = createDateSettings(Config_From_Date);
 	private final SettingsModelDate m_toDateSettings = createDateSettings(Config_To_Date);
 	protected final SettingsModelLong m_maxNumRecordsSettings = createLongSettings(Config_MAX_NUM_RECORDS, -1);
+	
+	private final SettingsModelString m_deviceIdColSettings = createSettingsDeviceIdColumn();
+
 	private final Date m_earliestDate = new Date(0);
 
 	protected final SimpleDateFormat m_dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX[z]");
@@ -100,28 +101,21 @@ public abstract class RetrieveDataNodeModel extends NodeModel {
 		return new Pair<>(from, to);
 	}
 
-	protected MeasurementCollection getMeasurementCollectionApi(final MeasurementApi aApi, final String aDeviceId) {
-		final MeasurementCollection measurementCollection;
-		final FilterBuilder filter = Filter.build().setFilter(FilterBy.BYSOURCE, aDeviceId);
-
-		// doesn't work as we don't know the expected date format....
-//		if (dateRestrictions.getFirst().isPresent()) {
-//			filter.setFilter(FilterBy.BYDATEFROM, m_c8yDateFormat.format(dateRestrictions.getFirst().get()));
-//		}
-//		if (dateRestrictions.getSecond().isPresent()) {
-//			filter.setFilter(FilterBy.BYDATETO, m_c8yDateFormat.format(dateRestrictions.getSecond().get()));
-//		}
-
-		// size of the results (Max. 2000)
-		measurementCollection = aApi.getMeasurements(addOptionalDateFilter(Optional.of(filter)).get(), 2000);
-		return measurementCollection;
+	protected long getMaxNumItemsToFetch() {
+		final long maxNum;
+		if (m_maxNumRecordsSettings.getLongValue() > 0) {
+			maxNum = m_maxNumRecordsSettings.getLongValue();
+		} else {
+			maxNum = Long.MAX_VALUE;
+		}
+		return maxNum;
 	}
-	
+
 	protected Optional<FilterBuilder> getOptionalDateFilter() {
 		return addOptionalDateFilter(Optional.empty());
 	}
 	
-	private Optional<FilterBuilder> addOptionalDateFilter(final Optional<FilterBuilder> aFilterOption) {
+	protected Optional<FilterBuilder> addOptionalDateFilter(final Optional<FilterBuilder> aFilterOption) {
 		// If From and To set to default, call the API with only Device ID
 		final Pair<Optional<Date>, Optional<Date>> dateRestrictions = getFromTo();
 		if (dateRestrictions.getFirst().isPresent() || dateRestrictions.getSecond().isPresent()) {
@@ -162,11 +156,20 @@ public abstract class RetrieveDataNodeModel extends NodeModel {
 		return new PortObjectSpec[] { outputTableSpec() };
 	}
 
+	protected IdIterator retrieveDeviceIDs(final BufferedDataTable inTable) {
+		if (inTable == null || m_deviceIdColSettings.getStringValue() == null) {
+			return new IdIterator();
+		}
+		final int colIx = inTable.getDataTableSpec().findColumnIndex(m_deviceIdColSettings.getStringValue());
+		return new IdIterator(inTable.iterator(), colIx);
+	}
+
 	@Override
 	protected void saveSettingsTo(final NodeSettingsWO settings) {
 		m_fromDateSettings.saveSettingsTo(settings);
 		m_toDateSettings.saveSettingsTo(settings);
 		m_maxNumRecordsSettings.saveSettingsTo(settings);
+		m_deviceIdColSettings.saveSettingsTo(settings);
 	}
 
 	/**
@@ -177,6 +180,7 @@ public abstract class RetrieveDataNodeModel extends NodeModel {
 		m_fromDateSettings.loadSettingsFrom(settings);
 		m_toDateSettings.loadSettingsFrom(settings);
 		m_maxNumRecordsSettings.loadSettingsFrom(settings);
+		m_deviceIdColSettings.loadSettingsFrom(settings);
 	}
 
 	/**
@@ -184,6 +188,7 @@ public abstract class RetrieveDataNodeModel extends NodeModel {
 	 */
 	@Override
 	protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+		m_deviceIdColSettings.validateSettings(settings);
 		m_fromDateSettings.validateSettings(settings);
 		m_toDateSettings.validateSettings(settings);
 		m_maxNumRecordsSettings.validateSettings(settings);

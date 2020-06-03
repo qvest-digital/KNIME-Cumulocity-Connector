@@ -8,7 +8,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.util.DataValueColumnFilter;
 
 /**
- * @author tarent solutions GmbH (vlahar)
+ * @author tarent solutions GmbH
  */
 public class RetrieveDataNodeDialog extends DefaultNodeSettingsPane {
 
@@ -16,7 +16,8 @@ public class RetrieveDataNodeDialog extends DefaultNodeSettingsPane {
 	static final String FROM_DATE_LABEL = "From Date";
 	static final String MAX_NUM_RECORDS_LABEL = "Max number of records to retrieve";
 
-	public RetrieveDataNodeDialog(final boolean aAddDeviceIdCol, final int aLimitNumRecords) {
+	public RetrieveDataNodeDialog(final boolean aAddDeviceIdCol, final int aLimitNumRecords, 
+			final boolean aRequireDeviceId) {
 		super();
 
 		if (aAddDeviceIdCol) {
@@ -24,7 +25,7 @@ public class RetrieveDataNodeDialog extends DefaultNodeSettingsPane {
 			@SuppressWarnings("unchecked")
 			final DialogComponentColumnNameSelection deviceIdCol = new DialogComponentColumnNameSelection(
 					RetrieveDataNodeModel.createSettingsDeviceIdColumn(), "Device IDs",
-					RetrieveDataNodeModel.IN_PORT_DATA_TABLE, true, false,
+					RetrieveDataNodeModel.IN_PORT_DATA_TABLE, aRequireDeviceId, !aRequireDeviceId,
 					new DataValueColumnFilter(StringValue.class));
 			this.addDialogComponent(deviceIdCol);
 		}

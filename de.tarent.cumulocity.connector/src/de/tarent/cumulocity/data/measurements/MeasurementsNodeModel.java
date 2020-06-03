@@ -1,12 +1,12 @@
 package de.tarent.cumulocity.data.measurements;
 
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -16,7 +16,6 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
-import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
@@ -27,10 +26,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelDate;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -38,9 +33,12 @@ import org.knime.core.node.port.PortType;
 import com.google.gson.internal.LazilyParsedNumber;
 import com.telekom.m2m.cot.restsdk.measurement.Measurement;
 import com.telekom.m2m.cot.restsdk.measurement.MeasurementApi;
+import com.telekom.m2m.cot.restsdk.measurement.MeasurementCollection;
 import com.telekom.m2m.cot.restsdk.util.ExtensibleObject;
+import com.telekom.m2m.cot.restsdk.util.Filter.FilterBuilder;
 
 import de.tarent.cumulocity.connector.CumulocityPortObject;
+import de.tarent.cumulocity.data.IdIterator;
 import de.tarent.cumulocity.data.RetrieveDataNodeModel;
 
 /**
@@ -48,14 +46,8 @@ import de.tarent.cumulocity.data.RetrieveDataNodeModel;
  */
 public class MeasurementsNodeModel extends RetrieveDataNodeModel {
 
-	static final int IN_PORT_DATA_TABLE = 1;
-
 	private static final NodeLogger logger = NodeLogger.getLogger(MeasurementsNodeModel.class);
-	private final SettingsModelString m_deviceIdColSettings = createSettingsDeviceIdColumn();
 
-	final static SettingsModelDate createDateSettings(final String aLabel) {
-		return new SettingsModelDate(aLabel);
-	}
 
 	/*
 	 * we have 2 input ports (connection info and device info) and one output port
@@ -75,16 +67,11 @@ public class MeasurementsNodeModel extends RetrieveDataNodeModel {
 			throws CanceledExecutionException {
 
 		final MeasurementApi measurementApi = getMeasurementApi((CumulocityPortObject) inData[0]);
-		final IdIterator device_ids = retrieveDeviceIDs((BufferedDataTable) inData[IN_PORT_DATA_TABLE], exec);
+		final IdIterator device_ids = retrieveDeviceIDs((BufferedDataTable) inData[IN_PORT_DATA_TABLE]);
 
 		long nIgnored = 0;
 		long rowIx = 0;
-		final long maxNum;
-		if (m_maxNumRecordsSettings.getLongValue() > 0) {
-			maxNum = m_maxNumRecordsSettings.getLongValue();
-		} else {
-			maxNum = Long.MAX_VALUE;
-		}
+		final long maxNum = getMaxNumItemsToFetch();
 
 		final BufferedDataContainer container = exec.createDataContainer(outputTableSpec());
 		// can be re-used as addRowToTable copies its content
@@ -186,38 +173,6 @@ public class MeasurementsNodeModel extends RetrieveDataNodeModel {
 		return new BufferedDataTable[] { container.getTable() };
 	}
 
-	private static final class IdIterator implements Iterator<String>, Closeable {
-		private final CloseableRowIterator m_rowIterator;
-		private final int m_colIx;
-
-		IdIterator(final CloseableRowIterator rowIterator, final int colIx) {
-			m_rowIterator = rowIterator;
-			m_colIx = colIx;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return m_rowIterator.hasNext();
-		}
-
-		@Override
-		public String next() {
-			final DataRow row = m_rowIterator.next();
-			final DataCell id_value = row.getCell(m_colIx);
-			return id_value.toString();
-		}
-
-		@Override
-		public void close() {
-			m_rowIterator.close();
-		}
-	}
-
-	private IdIterator retrieveDeviceIDs(final BufferedDataTable inTable, final ExecutionContext exec) {
-		final int colIx = inTable.getDataTableSpec().findColumnIndex(m_deviceIdColSettings.getStringValue());
-		return new IdIterator(inTable.iterator(), colIx);
-	}
-
 	protected DataTableSpec outputTableSpec() {
 		final List<DataColumnSpec> columns = new ArrayList<>();
 		columns.add(new DataColumnSpecCreator("Measurement ID", StringCell.TYPE).createSpec());
@@ -232,6 +187,24 @@ public class MeasurementsNodeModel extends RetrieveDataNodeModel {
 		return outputSpec;
 	}
 
+	private MeasurementCollection getMeasurementCollectionApi(final MeasurementApi aApi, 
+			final Optional<FilterBuilder> aDeviceIdFilter) {
+		final MeasurementCollection measurementCollection;
+		// final FilterBuilder filter = Filter.build().setFilter(FilterBy.BYSOURCE, aDeviceId);
+
+		// doesn't work as we don't know the expected date format....
+//		if (dateRestrictions.getFirst().isPresent()) {
+//			filter.setFilter(FilterBy.BYDATEFROM, m_c8yDateFormat.format(dateRestrictions.getFirst().get()));
+//		}
+//		if (dateRestrictions.getSecond().isPresent()) {
+//			filter.setFilter(FilterBy.BYDATETO, m_c8yDateFormat.format(dateRestrictions.getSecond().get()));
+//		}
+
+		// size of the results (Max. 2000)
+		measurementCollection = aApi.getMeasurements(addOptionalDateFilter(aDeviceIdFilter).get(), 2000);
+		return measurementCollection;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -252,29 +225,5 @@ public class MeasurementsNodeModel extends RetrieveDataNodeModel {
 		}
 		return super.configure(inSpecs);
 
-	}
-
-	@Override
-	protected void saveSettingsTo(final NodeSettingsWO settings) {
-		super.saveSettingsTo(settings);
-		m_deviceIdColSettings.saveSettingsTo(settings);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-		super.loadValidatedSettingsFrom(settings);
-		m_deviceIdColSettings.loadSettingsFrom(settings);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-		m_deviceIdColSettings.validateSettings(settings);
-		super.validateSettings(settings);
 	}
 }

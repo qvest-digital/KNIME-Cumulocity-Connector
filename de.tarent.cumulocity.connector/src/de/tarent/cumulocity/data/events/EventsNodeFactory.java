@@ -55,7 +55,7 @@ public class EventsNodeFactory
 	 */
 	@Override
 	public NodeDialogPane createNodeDialogPane() {
-		return new RetrieveDataNodeDialog(false, 100);
+		return new RetrieveDataNodeDialog(true, 100, false);
 	}
 
 }
